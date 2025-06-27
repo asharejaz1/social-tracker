@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.username) {
+    if (!body.url) {
       return NextResponse.json(
         { error: "Missing username in request body" },
         { status: 400 }
@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
     });
 
     const input = {
-      profiles: [body.username],
+      profiles: [body.url],
+      resultsPerPage: 5,
     };
 
     const run = await client
