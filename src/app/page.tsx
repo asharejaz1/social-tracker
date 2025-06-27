@@ -1,103 +1,138 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState<string | null>(null);
+  const [items, setItems] = useState<any[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponse(null);
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const url = formData.get("url");
+
+    try {
+      const res = await fetch("/api/instagram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) setResponse(data.error || "Failed to fetch");
+
+      setResponse(data.message || "Success");
+      console.log("Response data:", data.items);
+      setItems(data.items || []);
+    } catch (err) {
+      setResponse(`Something went wrong. \nError: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <main className="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center p-6">
+      {items.length === 0 && (
+        <div className="w-full max-w-xl rounded-xl shadow-xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 space-y-6 border border-gray-700">
+          <h1 className="text-3xl font-bold text-center text-white">
+            🔗 Submit a URL
+          </h1>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-300">
+              Website URL
+            </label>
+            <input
+              id="url"
+              name="url"
+              type="url"
+              required
+              placeholder="https://example.com"
+              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring-2 focus:ring-purple-600 outline-none"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {loading ? "Submitting..." : "Submit URL"}
+            </button>
+          </form>
+
+          {response && (
+            <div className="text-center text-sm text-gray-400">
+              Response:{" "}
+              <span className="font-medium text-white">{response}</span>
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      )}
+
+      {items.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-2xl font-bold mb-4 text-white">
+            Instagram Posts
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item, idx) => {
+              const imageUrl =
+                item.images?.[0] ||
+                item.displayUrl ||
+                "https://via.placeholder.com/400";
+              const formattedDate = new Date(item.timestamp).toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }
+              );
+
+              return (
+                <div
+                  key={item.id || idx}
+                  className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <img
+                    src={imageUrl}
+                    alt={item.alt || "Instagram post image"}
+                    className="w-full h-60 object-cover"
+                  />
+
+                  <div className="p-4 space-y-2">
+                    <p className="text-sm text-gray-400">{formattedDate}</p>
+
+                    <p className="text-white text-sm line-clamp-5">
+                      {item.caption || "No caption"}
+                    </p>
+
+                    <div className="flex justify-between items-center text-xs text-gray-500 pt-2">
+                      <span>❤️ {item.likesCount}</span>
+                      <span>💬 {item.commentsCount}</span>
+                    </div>
+
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-center mt-3 text-sm font-medium text-purple-400 hover:text-purple-300"
+                    >
+                      View on Instagram
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
