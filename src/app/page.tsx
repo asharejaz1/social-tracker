@@ -1,7 +1,9 @@
 "use client";
 
+import SocialTabs from "@/components/SocialTabs";
 import { extractTK, post } from "@/utils";
 import { useState } from "react";
+import { pl } from "zod/v4/locales";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -144,65 +146,20 @@ export default function Home() {
         </div>
       )}
 
-      {/* {items.length > 0 && (
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4 text-white">
-            Instagram Posts
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item, idx) => {
-              const imageUrl =
-                item.images?.[0] ||
-                item.displayUrl ||
-                "https://via.placeholder.com/400";
-              const formattedDate = new Date(item.timestamp).toLocaleDateString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                }
-              );
-
-              return (
-                <div
-                  key={item.id || idx}
-                  className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                >
-                  <img
-                    src={imageUrl}
-                    alt={item.alt || "Instagram post image"}
-                    className="w-full h-60 object-cover"
-                  />
-
-                  <div className="p-4 space-y-2">
-                    <p className="text-sm text-gray-400">{formattedDate}</p>
-
-                    <p className="text-white text-sm line-clamp-5">
-                      {item.caption || "No caption"}
-                    </p>
-
-                    <div className="flex justify-between items-center text-xs text-gray-500 pt-2">
-                      <span>❤️ {item.likesCount}</span>
-                      <span>💬 {item.commentsCount}</span>
-                    </div>
-
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-center mt-3 text-sm font-medium text-purple-400 hover:text-purple-300"
-                    >
-                      View on Instagram
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )} */}
+      {items.length > 0 && (
+        <SocialTabs
+          dataByAccount={{
+            Tiktok: {
+              platform: "tiktok",
+              posts: items[0],
+            },
+            Instagram: {
+              platform: "instagram",
+              posts: items[1] || [],
+            },
+          }}
+        />
+      )}
     </main>
   );
 }
